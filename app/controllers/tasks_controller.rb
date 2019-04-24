@@ -2,7 +2,7 @@ class TasksController < ApplicationController
   before_action :set_task, only: [:show, :edit, :update, :destroy]
 
   def index
-    @tasks = Task.all
+    @tasks = Task.all.page(params[:page]).per(15)
   end
   
   def show
@@ -30,7 +30,9 @@ class TasksController < ApplicationController
   def update
     if @task.update(task_params)
       flash[:success] = "Task は正常に更新されました"
-      redirect_to @task
+      # redirect_to @taskはTasksControllerのshowにとぶ
+      # redirect_to @task
+      redirect_back(fallback_location: root_url)
     else
       flash.now[:danger] = "Task は更新されませんでした"
       render :edit
@@ -52,6 +54,6 @@ class TasksController < ApplicationController
   end
   
   def task_params
-    params.require(:task).permit(:content, :status)
+    params.require(:task).permit(:content, :status, :deadline)
   end
 end
