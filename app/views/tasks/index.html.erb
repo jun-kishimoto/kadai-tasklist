@@ -1,3 +1,10 @@
+<% if logged_in? %>
+
+<p> 
+<%= current_user.name %>
+さん</p>
+
+
 <h1>タスク一覧</h1>
 
   <table class="table table-striped">
@@ -11,7 +18,7 @@
     </thread>
     <tbody>
 
-<% @tasks.each do |task| %>
+  <% @tasks.each do |task| %>
 
         <tr>
           <td>
@@ -27,8 +34,9 @@
 <%= task.deadline %>
 </td>
         </tr>
-
+        
 <% end %>
+        
     </tbody>
   </table>
   <div>
@@ -36,3 +44,15 @@
   </div>
 
 <%= link_to "新規タスクの投稿", new_task_path, class: "btn btn-primary" %>
+
+<% else %>
+
+  <div class="center jumbotron">
+    <div class="text-center">
+      <h1>Welcome to the Tasklist</h1>
+      
+<%= link_to 'Sign up now!', signup_path, class: 'btn btn-lg btn-primary' %>
+
+    </div>
+  </div>
+<% end %>
