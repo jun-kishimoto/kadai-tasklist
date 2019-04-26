@@ -1,8 +1,12 @@
 class TasksController < ApplicationController
   before_action :set_task, only: [:show, :edit, :update, :destroy]
-
+  before_action :check_user, only: [:show, :edit, :update, :destroy]
+  
   def index
-    @tasks = Task.all.page(params[:page]).per(15)
+    @tasks = Task.order(id: :desc).page(params[:page]).per(15)
+    # @tasks = current_user.tasks.page(params[:page]).per(15)
+    # @tasks = Task.where(user_id: current_user.id).page(params[:page]).per(15)
+    # @tasks = Task.where(user: current_user).page(params[:page]).per(15)
   end
   
   def show
@@ -13,13 +17,13 @@ class TasksController < ApplicationController
   end
   
   def create
-    @task = Task.new(task_params)
-    
+    @task = current_user.tasks.build(task_params)
     if @task.save
-      flash[:success] = "Task が正常に投稿されました"
-      redirect_to @task
+      flash[:success] = 'タスクを投稿しました。'
+      redirect_to root_url
     else
-      flash.now[:danger] = "Task が投稿されませんでした"
+      @tasks = current_user.tasks.order(id: :desc).page(params[:page])
+      flash.now[:danger] = 'タスクの投稿に失敗しました。'
       render :new
     end
   end
@@ -55,5 +59,11 @@ class TasksController < ApplicationController
   
   def task_params
     params.require(:task).permit(:content, :status, :deadline)
+  end
+  
+  def check_user
+    if @task.blank? or @task.user != current_user
+      redirect_to root_url
+    end
   end
 end
